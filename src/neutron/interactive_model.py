@@ -12,6 +12,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from transformers import (AutoModelForCausalLM, AutoTokenizer,
                           BitsAndBytesConfig, pipeline)
+
 from neutron import utilities
 
 transformers.logging.set_verbosity_error()
@@ -44,7 +45,8 @@ class InteractiveModel:
             print(f"total memory available {total_memory_gb}")
 
         if total_memory_gb >= 24:
-            self.model = AutoModelForCausalLM.from_pretrained(utilities.return_path("neutron_model"),
+            self.model = AutoModelForCausalLM.from_pretrained(
+                utilities.return_path("neutron_model"),
                 quantization_config=bnb_config,
                 device_map={"": 0},
             )

@@ -53,9 +53,9 @@ def get_input_with_default(message, default_text=None):
 
 def ensure_model_folder_exists(model_directory, auto_update=True):
     if model_directory == "neutron_model":
-                s3_url = model_s3_url
+        s3_url = model_s3_url
     else:
-        s3_url= chroma_s3_url
+        s3_url = chroma_s3_url
     try:
         metadata_file = os.path.join(model_directory, "metadata.json")
 
@@ -64,16 +64,15 @@ def ensure_model_folder_exists(model_directory, auto_update=True):
         except Exception as e:
             logging.error(f"Error getting local metadata: {e}")
 
-
         try:
             s3_etag = get_s3_file_etag(s3_url)
         except Exception as e:
             logging.error(f"Error getting S3 file etag: {e}")
 
-
         if s3_etag is None:
-            logging.warning("No S3 etag found. Possibly no internet connection or issue with S3.")
-
+            logging.warning(
+                "No S3 etag found. Possibly no internet connection or issue with S3."
+            )
 
         # Check if the model directory exists and has the same etag (metadata)
         if folder_exists_and_not_empty(model_directory) and local_etag == s3_etag:
@@ -95,7 +94,9 @@ def ensure_model_folder_exists(model_directory, auto_update=True):
                 logging.info("User chose not to update the model directory.")
                 return  # Exit if user chooses not to update
         else:
-            logging.info("Auto-update is enabled. Downloading new version if necessary...")
+            logging.info(
+                "Auto-update is enabled. Downloading new version if necessary..."
+            )
 
         # Proceed with the removal of the existing model directory and the download of the new version
         if os.path.exists(model_directory):
@@ -106,9 +107,10 @@ def ensure_model_folder_exists(model_directory, auto_update=True):
                 logging.error(f"Error removing existing model directory: {e}")
                 return
 
-        logging.info(f"{model_directory} not found or is outdated. Downloading and unzipping...")
+        logging.info(
+            f"{model_directory} not found or is outdated. Downloading and unzipping..."
+        )
         try:
-  
             download_and_unzip(s3_url, f"{model_directory}.zip")
             # Save new metadata
             save_local_metadata(metadata_file, s3_etag)
@@ -116,6 +118,7 @@ def ensure_model_folder_exists(model_directory, auto_update=True):
             logging.error(f"Error updating model directory: {e}")
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
+
 
 def resource_path(relative_path):
     """Get absolute path to resource, works for dev and for PyInstaller"""
@@ -217,9 +220,7 @@ def is_internet_available(host="8.8.8.8", port=53, timeout=3):
 
 def get_s3_file_etag(s3_url):
     if not is_internet_available():
-        logging.error(
-            "No internet connection available. Skipping version check."
-        )
+        logging.error("No internet connection available. Skipping version check.")
         return None
     response = requests.head(s3_url)
     return response.headers.get("ETag")
@@ -276,6 +277,4 @@ def check_new_pypi_version(package_name="neutron-ai"):
                 "yellow",
             )
     except Exception as e:
-        logging.error(
-            f"An error occurred while checking for the latest version: {e}"
-        )
+        logging.error(f"An error occurred while checking for the latest version: {e}")
