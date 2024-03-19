@@ -6,9 +6,7 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-
 from neutron.interactive_model import InteractiveModel
-
 
 # Set up argument parsing
 parser = argparse.ArgumentParser(description="Run the FastAPI server.")

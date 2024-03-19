@@ -21,13 +21,13 @@ Welcome to Neutron.
 
 **First i would like to thank the All-Mighty God who is the source of all knowledge, without Him, this would not be possible.**
 
-**Disclaimer: AI can make mistakes, consider cross-checking suggestions.**
+## **Disclaimer: AI can make mistakes, consider cross-checking suggestions.**
 
 ## [Click Here to Watch Neutron in Action](https://youtu.be/v5X8TNPsMbM)
 
 ## Why Neutron?
 
-The purpose of Neutron is straightforward: to provide security professionals  with access to a free AI assistant that can be invoked directly from their command line interface.
+The purpose of Neutron is straightforward: to provide security professionals  with access to a free AI assistant that can be invoked directly from their command line interface. It was built as part of the free tier of [Nebula Pro](https://www.berylliumsec.com/nebula-pro-waitlist).
 
 ## Compatibility
 
