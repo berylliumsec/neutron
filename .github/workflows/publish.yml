@@ -1,0 +1,131 @@
+name: Build, Test, and Release
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # This line adds write permissions for this job
+
+    steps:
+    - name: Check out the repo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install GitHub CLI
+      run: |
+        type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+        sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+        sudo apt update
+        sudo apt install gh -y
+
+    - name: Bump version in setup.py
+      if: github.event.pull_request.merged == true
+      id: bump_version
+      run: |
+        python bump_version.py
+    
+    - name: Upload new version as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: new-version-artifact
+        path: new_version.txt
+
+    - name: Configure Git
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        
+    - name: Commit and push version bump
+      run: |
+          git add setup.py
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Bump version [ci skip]"
+          git push origin main
+  
+    - name: Install build tool
+      run: |
+        python -m pip install --upgrade pip build
+
+    - name: Build release distributions
+      run: |
+        python -m build --sdist --wheel .
+
+    - name: Upload release distributions
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-dists
+        path: dist/
+
+  pypi-docker-publish:
+    runs-on: ubuntu-latest
+    environment: neutron
+    needs: release-build
+    permissions:
+      id-token: write
+      contents: write
+    
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Retrieve release distributions
+        uses: actions/download-artifact@v3
+        with:
+          name: release-dists
+          path: dist/
+
+      - name: Publish release distributions to PyPI
+        if: github.event.pull_request.merged == true 
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Download new version artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: new-version-artifact
+          path: ./
+
+      - name: Set new version variable
+        id: set_version_var
+        run: |
+          echo "NEW_VERSION=$(<new_version.txt)" >> $GITHUB_ENV
+
+
+     
+
+      - name: Create GitHub Release  
+        if: github.event.pull_request.merged == true
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.NEW_VERSION }}
+          release_name: Release ${{ env.NEW_VERSION }}
+          draft: false
+          prerelease: false
+          body: |
+            Release Notes:
+              - Initial release
+      - name: Upload Release Assets
+        if: github.event.pull_request.merged == true
+        run: |
+          for asset in dist/*; do
+            gh release upload ${{ env.NEW_VERSION }} $asset
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

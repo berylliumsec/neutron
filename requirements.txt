@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pydantic
+torch
+transformers
+regex
+argparse
+typing-extensions
+langchain_community
+langchain_core

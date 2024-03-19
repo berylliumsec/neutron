@@ -1,0 +1,4 @@
+[tool.ruff]
+ignore = ["E501", "E722", "F401"]
+fixable = ["ALL"]
+exclude = ["src/__init__.py"]
