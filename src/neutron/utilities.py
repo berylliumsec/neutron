@@ -261,7 +261,7 @@ def check_new_pypi_version(package_name="neutron-ai"):
         )
         return
 
-    logging.info(f"Installed version: {installed_version}", "green")
+    print(f"Installed version: {installed_version}", "green")
 
     try:
         latest_version = get_latest_pypi_version(package_name)
@@ -272,9 +272,8 @@ def check_new_pypi_version(package_name="neutron-ai"):
             return
 
         if latest_version > installed_version:
-            logging.info(
-                f"A newer version ({latest_version}) of {package_name} is available on PyPI. Please consider updating to access the latest features!",
-                "yellow",
+            print(
+                f"A newer version ({latest_version}) of {package_name} is available on PyPI. Please consider updating to access the latest features!"
             )
     except Exception as e:
         logging.error(f"An error occurred while checking for the latest version: {e}")
