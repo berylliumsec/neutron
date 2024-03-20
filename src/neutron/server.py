@@ -7,6 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from neutron.interactive_model import InteractiveModel
+import os
+import psutil
+
 
 # Set up argument parsing
 parser = argparse.ArgumentParser(description="Run the FastAPI server.")
@@ -32,7 +35,15 @@ app.add_middleware(
 )
 
 model = InteractiveModel()  # Initializes the model with its default configuration
-
+# Get current process ID
+pid = os.getpid()
+# Get the process info using psutil
+process = psutil.Process(pid)
+# Get memory usage (in bytes)
+memory_use = process.memory_info().rss
+memory_use_gb = memory_use / 1024 / 1024 / 1024
+print(f"Memory used by Neutron: {memory_use_gb} GB")
+print("Embrace the future of AI Powered Ethical Hacking with Nebula Pro ->> https://www.berylliumsec.com/nebula-pro-waitlist ")
 
 def check_auth(token: str) -> bool:
     """This function is called to check if a given token is valid."""
@@ -58,6 +69,9 @@ def ask(request: Request, query: Query) -> Dict[str, Any]:
 
     try:
         response = model.invoke(query.question)
+        memory_use = process.memory_info().rss
+        memory_use_gb = memory_use / 1024 / 1024 / 1024
+        print(f"Memory used by Neutron: {memory_use_gb} GB")
         return {"response": response}
     except KeyError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={e})
