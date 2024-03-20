@@ -42,7 +42,9 @@ class InteractiveModel:
             total_memory_gb = torch.cuda.get_device_properties(0).total_memory / (
                 1024**3
             )  # Convert bytes to GB
-            print(f"total memory available {total_memory_gb}")
+            print(f"total GPU memory available {total_memory_gb}")
+            if total_memory_gb < 24:
+                print("There isnt enough GPU memory, will use CPU")
 
         if total_memory_gb >= 24:
             self.model = AutoModelForCausalLM.from_pretrained(

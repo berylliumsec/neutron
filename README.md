@@ -23,11 +23,25 @@ Welcome to Neutron.
 
 ## **Disclaimer: AI can make mistakes, consider cross-checking suggestions.**
 
-## [Click Here to Watch Neutron in Action](https://youtu.be/v5X8TNPsMbM)
+## 🌐 Introducing Nebula Pro: A New Era in Ethical Hacking 🌐
+
+🚀 We're thrilled to unveil a sneak peek of Nebula Pro, our latest innovation designed to empower ethical hackers with advanced, AI-driven capabilities. After months of dedicated development, we have launched the preview version. Some of the exciting features are:
+
+- AI Powered Autonomous Mode
+- AI Powered Suggestions
+- AI Powered Note Taking
+
+**Neutron will become a part of Nebula Pro's free tier**
+# 📺 [Click Here to Get Access To Nebula Pro Now](https://www.berylliumsec.com/nebula-pro-waitlist) 🚀
+
+
 
 ## Why Neutron?
 
 The purpose of Neutron is straightforward: to provide security professionals  with access to a free AI assistant that can be invoked directly from their command line interface. It was built as part of the free tier of [Nebula Pro](https://www.berylliumsec.com/nebula-pro-waitlist).
+
+## [Click Here to Watch Neutron in Action](https://youtu.be/v5X8TNPsMbM)
+
 
 ## Compatibility
 
@@ -37,9 +51,9 @@ Neutron has been extensively tested and optimized for Linux platforms. As of now
 
 - Storage: A minimum of 50GB is recommended.
 
-- RAM: A minimum of 32GB RAM memory is recommended.
+- RAM: A minimum of 16GB RAM memory is recommended.
 
-- Graphics Processing Unit (GPU): While not mandatory, having at least 24GB of GPU memory is recommended for optimal performance.
+- Graphics Processing Unit (GPU) (NOT MANDATORY, Neutron can run on CPU): While not mandatory, having at least 24GB of GPU memory is recommended for optimal performance.
 
 
 **PYPI based distribution requirement(s)**

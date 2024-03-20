@@ -120,7 +120,7 @@ jobs:
           prerelease: false
           body: |
             Release Notes:
-              - Updating Readme and Linting
+              - Updating Readme and adding memory usage display
       - name: Upload Release Assets
         if: github.event.pull_request.merged == true
         run: |

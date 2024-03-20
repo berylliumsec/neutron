@@ -2,6 +2,7 @@ import argparse
 import os
 from typing import Any, Dict
 
+import psutil
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -32,6 +33,17 @@ app.add_middleware(
 )
 
 model = InteractiveModel()  # Initializes the model with its default configuration
+# Get current process ID
+pid = os.getpid()
+# Get the process info using psutil
+process = psutil.Process(pid)
+# Get memory usage (in bytes)
+memory_use = process.memory_info().rss
+memory_use_gb = memory_use / 1024 / 1024 / 1024
+print(f"Memory used by Neutron: {memory_use_gb} GB")
+print(
+    "Embrace the future of AI Powered Ethical Hacking with Nebula Pro ->> https://www.berylliumsec.com/nebula-pro-waitlist "
+)
 
 
 def check_auth(token: str) -> bool:
@@ -58,6 +70,9 @@ def ask(request: Request, query: Query) -> Dict[str, Any]:
 
     try:
         response = model.invoke(query.question)
+        memory_use = process.memory_info().rss
+        memory_use_gb = memory_use / 1024 / 1024 / 1024
+        print(f"Memory used by Neutron: {memory_use_gb} GB")
         return {"response": response}
     except KeyError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={e})
