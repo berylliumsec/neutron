@@ -43,7 +43,7 @@ class InteractiveModel:
                 1024**3
             )  # Convert bytes to GB
             print(f"total GPU memory available {total_memory_gb}")
-            if total_memory_gb <24:
+            if total_memory_gb < 24:
                 print("There isnt enough GPU memory, will use CPU")
 
         if total_memory_gb >= 24:

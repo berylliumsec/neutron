@@ -241,27 +241,23 @@ def get_latest_pypi_version(package_name):
         if response.status_code == 200:
             return response.json()["info"]["version"]
     except requests.exceptions.RequestException as e:
-        logging.error(f"Failed to get latest version information: {e}", "red")
+        logging.error(f"Failed to get latest version information: {e}")
     return None
 
 
 def check_new_pypi_version(package_name="neutron-ai"):
     """Check if a newer version of the package is available on PyPI."""
     if not is_internet_available():
-        logging.error(
-            "No internet connection available. Skipping version check.", "red"
-        )
+        logging.error("No internet connection available. Skipping version check.")
         return
 
     try:
         installed_version = version(package_name)
     except Exception as e:
-        logging.error(
-            f"Error retrieving installed version of {package_name}: {e}", "red"
-        )
+        logging.error(f"Error retrieving installed version of {package_name}: {e}")
         return
 
-    print(f"Installed version: {installed_version}", "green")
+    print(f"Installed version: {installed_version}")
 
     try:
         latest_version = get_latest_pypi_version(package_name)

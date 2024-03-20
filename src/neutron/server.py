@@ -2,14 +2,12 @@ import argparse
 import os
 from typing import Any, Dict
 
+import psutil
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from neutron.interactive_model import InteractiveModel
-import os
-import psutil
-
 
 # Set up argument parsing
 parser = argparse.ArgumentParser(description="Run the FastAPI server.")
@@ -43,7 +41,10 @@ process = psutil.Process(pid)
 memory_use = process.memory_info().rss
 memory_use_gb = memory_use / 1024 / 1024 / 1024
 print(f"Memory used by Neutron: {memory_use_gb} GB")
-print("Embrace the future of AI Powered Ethical Hacking with Nebula Pro ->> https://www.berylliumsec.com/nebula-pro-waitlist ")
+print(
+    "Embrace the future of AI Powered Ethical Hacking with Nebula Pro ->> https://www.berylliumsec.com/nebula-pro-waitlist "
+)
+
 
 def check_auth(token: str) -> bool:
     """This function is called to check if a given token is valid."""
