@@ -139,9 +139,10 @@ To use Neutron AI directly from the command line using a shorter alias for examp
 
 ```bash
 function AN() {
-    local query=\"$*\"
-    neutron-client \"\$query\"
+    local query="$*"
+    neutron-client "$query"
 }
+
 ```
 After adding, restart your terminal or run 'source ~/.bashrc' (or 'source ~/.zshrc') to apply the changes.
 
