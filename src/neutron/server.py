@@ -42,7 +42,7 @@ memory_use = process.memory_info().rss
 memory_use_gb = memory_use / 1024 / 1024 / 1024
 print(f"Memory used by Neutron: {memory_use_gb} GB")
 print(
-    "Embrace the future of AI Powered Ethical Hacking with Nebula Pro ->> https://www.berylliumsec.com/nebula-pro-waitlist "
+    "Neutron is now part of Nebula Pro's Free Tier.\nEmbrace the future of AI Powered Ethical Hacking with Nebula Pro ->> https://www.berylliumsec.com/nebula-pro-waitlist "
 )
 
 
