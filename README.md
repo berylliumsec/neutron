@@ -31,7 +31,7 @@ Welcome to Neutron.
 - AI Powered Suggestions
 - AI Powered Note Taking
 
-**Neutron will become a part of Nebula Pro's free tier**
+**Neutron is now a part of Nebula Pro's free tier**
 # 📺 [Click Here to Get Access To Nebula Pro Now](https://www.berylliumsec.com/nebula-pro-waitlist) 🚀
 
 
@@ -39,6 +39,7 @@ Welcome to Neutron.
 ## Why Neutron?
 
 The purpose of Neutron is straightforward: to provide security professionals  with access to a free AI assistant that can be invoked directly from their command line interface. It was built as part of the free tier of [Nebula Pro](https://www.berylliumsec.com/nebula-pro-waitlist).
+
 
 ## [Click Here to Watch Neutron in Action](https://youtu.be/v5X8TNPsMbM)
 
