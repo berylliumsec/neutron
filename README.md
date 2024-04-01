@@ -51,7 +51,7 @@ Neutron has been extensively tested and optimized for Linux platforms. As of now
 
 - Storage: A minimum of 50GB is recommended.
 
-- RAM: A minimum of 16GB RAM memory is recommended.
+- RAM: A minimum of 32GB RAM memory is recommended.
 
 - Graphics Processing Unit (GPU) (NOT MANDATORY, Neutron can run on CPU): While not mandatory, having at least 24GB of GPU memory is recommended for optimal performance.
 
