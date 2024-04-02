@@ -33,7 +33,12 @@ setup(
         "fastapi",
         "uvicorn",
         "pydantic",
-        # Add any other dependencies as necessary
+        "langchain",
+        "regex",
+        "argparse",
+        "typing-extensions"
+    
+
     ],
     entry_points={
         "console_scripts": [
