@@ -21,7 +21,7 @@ transformers.logging.set_verbosity_error()
 class InteractiveModel:
     def __init__(self):
         # Device configuration
-
+        
         utilities.check_new_pypi_version()
         utilities.ensure_model_folder_exists("neutron_model")
         utilities.ensure_model_folder_exists("neutron_chroma.db")

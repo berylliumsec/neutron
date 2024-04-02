@@ -1,7 +1,7 @@
 import argparse
 import os
 from typing import Any, Dict
-
+import torch
 import psutil
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,7 +31,9 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
-
+if not torch.cuda.is_available():
+    print("At least 8GB of GPU is required for Neutron to run")
+    exit(0)
 model = InteractiveModel()  # Initializes the model with its default configuration
 # Get current process ID
 pid = os.getpid()
