@@ -14,7 +14,7 @@ from transformers import (AutoModelForCausalLM, AutoTokenizer,
                           BitsAndBytesConfig, pipeline)
 
 from neutron import utilities
-
+import sys
 transformers.logging.set_verbosity_error()
 
 
@@ -22,6 +22,9 @@ class InteractiveModel:
     def __init__(self):
         # Device configuration
 
+        if not torch.cuda.is_available():
+            raise "No gpus available"
+            sys.exit()
         utilities.check_new_pypi_version()
         utilities.ensure_model_folder_exists("neutron_model")
         utilities.ensure_model_folder_exists("neutron_chroma.db")
