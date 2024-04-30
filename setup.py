@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="neutron-ai",
-    version="1.0.0b6",
+    version="1.0.0b7",
     description="AI Powered Ethical Hacking Assistant",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
