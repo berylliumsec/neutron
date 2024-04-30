@@ -14,14 +14,17 @@ from transformers import (AutoModelForCausalLM, AutoTokenizer,
                           BitsAndBytesConfig, pipeline)
 
 from neutron import utilities
-
+import sys
 transformers.logging.set_verbosity_error()
 
 
 class InteractiveModel:
     def __init__(self):
         # Device configuration
-        
+
+        if not torch.cuda.is_available():
+            raise "No gpus available"
+            sys.exit()
         utilities.check_new_pypi_version()
         utilities.ensure_model_folder_exists("neutron_model")
         utilities.ensure_model_folder_exists("neutron_chroma.db")
@@ -37,27 +40,13 @@ class InteractiveModel:
             model_max_length=8192,
             low_cpu_mem_usage=True,
         )
-        total_memory_gb = 0
-        if torch.cuda.is_available():
-            total_memory_gb = torch.cuda.get_device_properties(0).total_memory / (
-                1024**3
-            )  # Convert bytes to GB
-            print(f"total GPU memory available {total_memory_gb}")
-            if total_memory_gb < 24:
-                print("There isnt enough GPU memory, will use CPU")
 
-        if total_memory_gb >= 24:
-            self.model = AutoModelForCausalLM.from_pretrained(
-                utilities.return_path("neutron_model"),
-                quantization_config=bnb_config,
-                device_map={"": 0},
-            )
-        else:
-            self.model = AutoModelForCausalLM.from_pretrained(
-                utilities.return_path("neutron_model"),
-                low_cpu_mem_usage=True,
-                quantization_config=bnb_config,
-            )
+        self.model = AutoModelForCausalLM.from_pretrained(
+            utilities.return_path("neutron_model"),
+            low_cpu_mem_usage=True,
+            quantization_config=bnb_config,
+            device_map="auto",
+        )
         # Pipeline configuration
         self.pipe = pipeline(
             "text-generation",
@@ -79,7 +68,6 @@ class InteractiveModel:
             persist_directory="neutron_chroma.db",
         )
         self.retriever = self.db.as_retriever(search_type="mmr")
-        # self.retriever = self.db.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": 1.0})
 
         self.template = ChatPromptTemplate.from_template(
             """
@@ -111,7 +99,7 @@ class InteractiveModel:
 
     def invoke(self, question: str):
         self.search_results = self.search.run(question)
-        # print(self.search_results)
+
         return self.chain.invoke(question)
 
     def search_duck(self, question: str):

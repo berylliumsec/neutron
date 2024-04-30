@@ -36,9 +36,7 @@ setup(
         "langchain",
         "regex",
         "argparse",
-        "typing-extensions"
-    
-
+        "typing-extensions",
     ],
     entry_points={
         "console_scripts": [
