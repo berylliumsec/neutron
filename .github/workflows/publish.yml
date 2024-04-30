@@ -120,7 +120,7 @@ jobs:
           prerelease: false
           body: |
             Release Notes:
-              - Adding GPU requirement
+              - Adding auto GPU selection
       - name: Upload Release Assets
         if: github.event.pull_request.merged == true
         run: |
