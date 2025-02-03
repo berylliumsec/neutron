@@ -19,10 +19,29 @@ parser.add_argument(
     help="The hostname to listen on. Default is 0.0.0.0.",
 )
 parser.add_argument(
-    "--port", type=int, default=8000, help="The port of the webserver. Default is 8000."
-)  # FastAPI's default port is 8000
+    "--port",
+    type=int,
+    default=8000,
+    help="The port of the webserver. Default is 8000."
+)
+parser.add_argument(
+    "--model_name",
+    type=str,
+    default="deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+    help="The name of the model to load. Default is DeepSeek-R1-Distill-Llama-8B.",
+)
+parser.add_argument(
+    "--cache_dir",
+    type=str,
+    default="/media/agent/dige-backup/cache",
+    help="Where to store the downloaded model",
+)
+parser.add_argument(
+    "--disable_search",
+    action="store_true",
+    help="Disable DuckDuckGo search functionality.",
+)
 args = parser.parse_args()
-
 
 app = FastAPI()
 app.add_middleware(
@@ -32,29 +51,35 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
 if not torch.cuda.is_available():
     print("At least 8GB of GPU is required for Neutron to run")
     exit(0)
-model = InteractiveModel()  # Initializes the model with its default configuration
-# Get current process ID
+
+# Initialize the InteractiveModel with the selected model name and search setting.
+model = InteractiveModel(
+    model_name=args.model_name,
+    use_search=not args.disable_search,
+    cache_dir = args.cache_dir
+)
+
+# Get current process ID and memory info
 pid = os.getpid()
-# Get the process info using psutil
 process = psutil.Process(pid)
-# Get memory usage (in bytes)
 memory_use = process.memory_info().rss
 memory_use_gb = memory_use / 1024 / 1024 / 1024
-print(f"Memory used by Neutron: {memory_use_gb} GB")
+print(f"Memory used by Neutron: {memory_use_gb:.2f} GB")
 print(
-    "Neutron is now part of Nebula Pro's Free Tier.\nEmbrace the future of AI Powered Ethical Hacking with Nebula Pro ->> https://www.berylliumsec.com/nebula-pro-waitlist "
+    "Neutron is now part of Nebula Pro's Free Tier.\n"
+    "Embrace the future of AI Powered Ethical Hacking with Nebula Pro ->> "
+    "https://www.berylliumsec.com/nebula-pro-waitlist "
 )
 
 
 def check_auth(token: str) -> bool:
-    """This function is called to check if a given token is valid."""
+    """Check if a given token is valid."""
     # Retrieve the secret token from the NEUTRON_TOKEN environment variable
-    secret_token = os.environ.get(
-        "NEUTRON_TOKEN", "default_token"
-    )  # Use a default value if NEUTRON_TOKEN is not set
+    secret_token = os.environ.get("NEUTRON_TOKEN", "default_token")
     return token == secret_token
 
 
@@ -75,10 +100,10 @@ def ask(request: Request, query: Query) -> Dict[str, Any]:
         response = model.invoke(query.question)
         memory_use = process.memory_info().rss
         memory_use_gb = memory_use / 1024 / 1024 / 1024
-        print(f"Memory used by Neutron: {memory_use_gb} GB")
+        print(f"Memory used by Neutron: {memory_use_gb:.2f} GB")
         return {"response": response}
     except KeyError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={e})
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={str(e)})
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -88,7 +113,6 @@ def ask(request: Request, query: Query) -> Dict[str, Any]:
 
 def main():
     import uvicorn
-
     uvicorn.run(app, host=args.host, port=args.port)
 
 

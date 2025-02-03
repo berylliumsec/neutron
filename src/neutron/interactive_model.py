@@ -1,17 +1,12 @@
 import re
-
 import torch
 import transformers
-from langchain_community.embeddings.sentence_transformer import \
-    SentenceTransformerEmbeddings
-from langchain_community.llms import HuggingFacePipeline
+from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
 from langchain_community.tools import DuckDuckGoSearchRun
-from langchain_community.vectorstores import Chroma
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
-from transformers import (AutoModelForCausalLM, AutoTokenizer,
-                          BitsAndBytesConfig, pipeline)
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, pipeline
 
 from neutron import utilities
 import sys
@@ -19,34 +14,33 @@ transformers.logging.set_verbosity_error()
 
 
 class InteractiveModel:
-    def __init__(self):
+    def __init__(self, cache_dir, model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B", use_search: bool = True):
         # Device configuration
-
         if not torch.cuda.is_available():
-            raise "No gpus available"
-            sys.exit()
+            raise Exception("No GPUs available")
+ 
         utilities.check_new_pypi_version()
-        utilities.ensure_model_folder_exists("neutron_model")
-        utilities.ensure_model_folder_exists("neutron_chroma.db")
-        # Model and tokenizer configuration
+
+        # Model and tokenizer configuration for 8-bit quantization
         bnb_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_quant_type="nf4",
-            bnb_4bit_compute_dtype=torch.bfloat16,
+            load_in_8bit=True
         )
 
         self.tokenizer = AutoTokenizer.from_pretrained(
-            utilities.return_path("neutron_model"),
+            model_name,
             model_max_length=8192,
             low_cpu_mem_usage=True,
+            cache_dir=cache_dir
         )
 
         self.model = AutoModelForCausalLM.from_pretrained(
-            utilities.return_path("neutron_model"),
+            model_name,
             low_cpu_mem_usage=True,
             quantization_config=bnb_config,
             device_map="auto",
+            cache_dir=cache_dir
         )
+
         # Pipeline configuration
         self.pipe = pipeline(
             "text-generation",
@@ -57,23 +51,19 @@ class InteractiveModel:
             use_fast=True,
         )
         self.search_results = ""
-        self.search = DuckDuckGoSearchRun()
-        # Components for LangChain
-        self.llm = HuggingFacePipeline(pipeline=self.pipe)
-        self.embeddings_model = SentenceTransformerEmbeddings(
-            model_name="all-MiniLM-L12-v2"
-        )
-        self.db = Chroma(
-            embedding_function=self.embeddings_model,
-            persist_directory="neutron_chroma.db",
-        )
-        self.retriever = self.db.as_retriever(search_type="mmr")
+        self.use_search = use_search
+        if self.use_search:
+            self.search = DuckDuckGoSearchRun()
 
+        # Components for LangChain using the new HuggingFacePipeline
+        self.llm = HuggingFacePipeline(pipeline=self.pipe)
+
+        # Create a prompt template and build the chain.
         self.template = ChatPromptTemplate.from_template(
             """
-            As a penetration testing assistant, provide a response based on your knowledge and the provided 'context',and 'context2. 
-            Ensure the response is directly relevant to the inputs, focusing particularly on elements common to both 'context' and 'context2'. 
-            Revise your responses to maintain a consistent context throughout and do not alter commands returned in the contexts, but you can modify surrounding statements. all commands should be formatted using backticks. Eliminate any sections that diverge from or do not fit within this established context.
+            As a penetration testing assistant, provide a response based on your knowledge and the provided context and context2. 
+            Ensure the response is directly relevant to the inputs, focusing particularly on elements common to both context and context2. 
+            Revise your responses to maintain a consistent context throughout and do not alter commands returned in the contexts, but you can modify surrounding statements. All commands should be formatted using backticks. Eliminate any sections that diverge from or do not fit within this established context.
             Given contexts:
             - Context: {context}
             - Context2: {context2}
@@ -82,14 +72,10 @@ class InteractiveModel:
             """
         )
 
-        self.current_mode = "retrieval"  # Default mode
-        self.search_results = ""
-        self.search = DuckDuckGoSearchRun()
-
         self.chain = (
             {
-                "context": self.retriever,
-                "context2": lambda x: self.search_results,
+                "context": lambda _: "",  # Changed from a plain string to a callable returning an empty string.
+                "context2": lambda x: self.search_results if self.use_search else "",
                 "question": RunnablePassthrough(),
             }
             | self.template
@@ -98,19 +84,15 @@ class InteractiveModel:
         )
 
     def invoke(self, question: str):
-        self.search_results = self.search.run(question)
-
+        if self.use_search:
+            self.search_results = self.search.run(question)
         return self.chain.invoke(question)
 
     def search_duck(self, question: str):
-        # Perform the search
-        result = self.search(question)
-        # This regular expression replaces periods followed by a space (and not preceded by a digit) with a period followed by two newlines and a space.
-        # It also adds two newlines before numbers followed by a period and a space (e.g., in numbered lists).
-        formatted_result = re.sub(
-            r"(?<!\d)\. ", ".\n\n ", result
-        )  # Add newlines after sentences not in numbered lists.
-        formatted_result = re.sub(
-            r"(\n|^)(\d+\.) ", r"\1\n\n\2 ", formatted_result
-        )  # Add newlines before numbered list items.
+        if not self.use_search:
+            return ""
+        # Perform the search and format the result
+        result = self.search.run(question)
+        formatted_result = re.sub(r"(?<!\d)\. ", ".\n\n ", result)
+        formatted_result = re.sub(r"(\n|^)(\d+\.) ", r"\1\n\n\2 ", formatted_result)
         return formatted_result

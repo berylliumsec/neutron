@@ -1,3 +1,64 @@
+[tool.poetry]
+name = "neutron-ai"
+version = "1.0.0b7"
+description = "AI Powered Ethical Hacking Assistant"
+readme = "README.md"
+authors = ["David I <david@berylliumsec.com>"]
+license = "BSD"
+homepage = "https://github.com/berylliumsec/neutron"
+repository = "https://github.com/berylliumsec/neutron"
+keywords = ["AI", "Ethical Hacking"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Security",
+    "Topic :: Text Processing :: Linguistic",
+]
+
+# Tell Poetry where your package is located.
+packages = [
+    { include = "neutron", from = "src" }
+]
+
+# Include additional non-code files in your package (e.g. images)
+include = [
+    "src/neutron/images/*"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+torch = "*"
+transformers = "*"
+fastapi = "*"
+uvicorn = "*"
+pydantic = "*"
+langchain = "*"
+regex = "*"
+argparse = "*"
+typing-extensions = "*"
+psutil = "*"
+langchain-community = "0.3.16"
+langchain-core = "*"
+prompt_toolkit = "*"
+accelerate = "*"
+bitsandbytes = "*"
+duckduckgo-search = "*"
+[tool.poetry.extras]
+flash = ["flash-attn"]
+
+[tool.poetry.scripts]
+neutron-client = "neutron.client:main"
+neutron-server = "neutron.server:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.ruff]
 ignore = ["E501", "E722", "F401"]
 fixable = ["ALL"]

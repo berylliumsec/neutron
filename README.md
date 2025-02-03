@@ -74,7 +74,7 @@ Neutron has been extensively tested and optimized for Linux platforms. As of now
 To install the above dependencies:
 
 ```bash
-pip install fastapi uvicorn pydantic torch transformers regex argparse typing-extensions langchain_community langchain_core
+poetry install
 
 ```
 
@@ -99,14 +99,19 @@ pip install neutron-ai --upgrade
 ### Server
 
 ``` bash
-usage: server.py [-h] [--host HOST] [--port PORT]
+usage: server.py [-h] [--host HOST] [--port PORT] [--model_name MODEL_NAME]
+                 [--cache_dir CACHE_DIR] [--disable_search]
 
 Run the FastAPI server.
 
 options:
-  -h, --help   show this help message and exit
-  --host HOST  The hostname to listen on. Default is 0.0.0.0.
-  --port PORT  The port of the webserver. Default is 8000.
+  -h, --help            show this help message and exit
+  --host HOST           The hostname to listen on. Default is 0.0.0.0.
+  --port PORT           The port of the webserver. Default is 8000.
+  --model_name MODEL_NAME
+                        The name of the model to load. Default is deepseek-ai/DeepSeek-R1-Distill-Llama-8B.
+  --cache_dir CACHE_DIR Where to store the downloaded model. Default is /media/agent/dige-backup/cache.
+  --disable_search      Disable DuckDuckGo search functionality.
 ```
 
 The server can be invoked using the following command after installation using pip:
